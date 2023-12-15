@@ -17,7 +17,7 @@ def load_prompt(content):
 	-----------------
 
 	{content}
-	
+
 	-----------------
 	End of Content.
 
@@ -57,9 +57,9 @@ def load_prompt_with_questions(content):
 
 	Now remember short response with only 1 code snippet per message and ask questions\
 	to test user knowledge right after every short lesson.
-	
+
 	Your teaching should be in the following interactive format:
-	
+
 	Short lesson 3-5 sentences long
 	Questions about the short lesson (1-3 questions)
 

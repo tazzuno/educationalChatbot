@@ -1,6 +1,6 @@
 # Functions
 import streamlit as st
-from langchain.schema import HumanMessage
+from langchain.schema import HumanMessage, AIMessage
 
 
 @st.cache_data()

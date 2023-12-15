@@ -1,3 +1,4 @@
+import io
 import os
 import streamlit as st
 from dotenv import load_dotenv, find_dotenv
@@ -18,7 +19,7 @@ def run_langchain_model(prompt, lesson_type, lesson_content):
         # Set up a streaming handler for the model
         with st.chat_message("assistant"):
             stream_handler = StreamHandler(st.empty())
-            model = ChatOpenAI(streaming=True, callbacks=[stream_handler], model="gpt-3.5-turbo",
+            model = ChatOpenAI(streaming=True, callbacks=[stream_handler], model="gpt-3.5-turbo-16k",
                                openai_api_key=openai_api_key)
 
             # Load a prompt template based on the lesson type
@@ -40,6 +41,32 @@ def run_langchain_model(prompt, lesson_type, lesson_content):
     except Exception as e:
         # Handle any errors that occur during the execution of the code
         st.error(f"An error occurred: {e}")
+
+
+def download_chat():
+    messages = st.session_state.get("messages", [])  # Retrieve messages from session state
+
+    chat_content = ""
+    for msg in messages:
+        if isinstance(msg, AIMessage):
+            chat_content += f"AI: {msg.content}\n"
+        elif isinstance(msg, HumanMessage):
+            chat_content += f"User: {msg.content}\n"
+        else:
+            chat_content += f"Unknown Message Type: {msg}\n"
+
+    chat_bytes = chat_content.encode("utf-8")  # Encode chat content as bytes
+
+    chat_buffer = io.BytesIO(chat_bytes)
+    st.download_button("Download Chat", chat_buffer, key="download_chat", file_name="chat.txt", mime="application/txt")
+
+
+def reset_lesson():
+    st.session_state["messages"] = []
+    st.session_state["completed_lessons"] = []
+    st.session_state["current_lesson"] = None
+    st.session_state["current_lesson_type"] = None
+    st.session_state["code_snippet"] = None
 
 
 # Main Streamlit Code
@@ -76,9 +103,8 @@ if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
     run_langchain_model(prompt, lesson_type, lesson_content)
 
-# Display code snippet if applicable
-if "code_snippet" in st.session_state:
-    chatbot_functions.display_code_snippet(st.session_state.code_snippet)
 
 # Update lesson progress
-chatbot_functions.update_progress(lesson_selection)
+
+download_chat()
+st.sidebar.button("Reset Lesson", on_click=reset_lesson)
