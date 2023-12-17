@@ -1,13 +1,22 @@
-import io
 import os
 import streamlit as st
 from dotenv import load_dotenv, find_dotenv
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 import get_prompt
-import chatbot_functions
 from langchain.schema import AIMessage, HumanMessage
 from StreamHandler import StreamHandler
+
+
+def handle_messages():
+    # Initialize session state
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    for msg in st.session_state["messages"]:
+        if isinstance(msg, HumanMessage):
+            st.chat_message("user").write(msg.content)
+        else:
+            st.chat_message("assistant").write(msg.content)
 
 
 def run_langchain_model(prompt, lesson_type, lesson_content):
@@ -43,22 +52,36 @@ def run_langchain_model(prompt, lesson_type, lesson_content):
         st.error(f"An error occurred: {e}")
 
 
+@st.cache_data()
+def get_lesson_content(lesson_file):
+    try:
+        with open(lesson_file, "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        st.error(f"Error: Lesson file not found at {lesson_file}")
+        st.stop()
+
+
 def download_chat():
     messages = st.session_state.get("messages", [])  # Retrieve messages from session state
 
-    chat_content = ""
+    chat_content = "<html><head><link rel='stylesheet' type='text/css' href='styles.css'></head><body>"
     for msg in messages:
         if isinstance(msg, AIMessage):
-            chat_content += f"AI: {msg.content}\n"
+            chat_content += f"<p class='message ai-message'><strong>AI:</strong> {msg.content}</p>"
         elif isinstance(msg, HumanMessage):
-            chat_content += f"User: {msg.content}\n"
+            chat_content += f"<p class='message user-message'><strong>User:</strong> {msg.content}</p>"
         else:
-            chat_content += f"Unknown Message Type: {msg}\n"
+            chat_content += f"<p class='message'>Unknown Message Type: {msg}</p>"
 
-    chat_bytes = chat_content.encode("utf-8")  # Encode chat content as bytes
+    chat_content += "</body></html>"
 
-    chat_buffer = io.BytesIO(chat_bytes)
-    st.download_button("Download Chat", chat_buffer, key="download_chat", file_name="chat.txt", mime="application/txt")
+    with open("chat.html", "w", encoding="utf-8") as html_file:
+        html_file.write(chat_content)
+
+    # Download the generated HTML file
+    st.download_button("Download Chat", open("chat.html", "rb"), key="download_chat", file_name="chat.html",
+                       mime="text/html")
 
 
 def reset_lesson():
@@ -69,15 +92,20 @@ def reset_lesson():
     st.session_state["code_snippet"] = None
 
 
+def setup_page():
+    st.set_page_config(page_title="LangChain: Getting Started Class", page_icon="🦜")
+    st.title("🦜 LangChain: Getting Started Class")
+
+
 # Main Streamlit Code
-chatbot_functions.setup_page()
+setup_page()
 
 # Lesson selection dictionary
 lesson_selection = st.sidebar.selectbox("Select Lesson", list(get_prompt.get_lesson_guide().keys()))
 
 # Display lesson content and description based on selection
 lesson_info = get_prompt.get_lesson_guide()[lesson_selection]
-lesson_content = chatbot_functions.get_lesson_content(lesson_info["file"])
+lesson_content = get_lesson_content(lesson_info["file"])
 lesson_description = lesson_info["description"]
 
 # Radio buttons for lesson type selection
@@ -97,14 +125,11 @@ st.markdown(f"**{lesson_selection}**")
 st.write(lesson_description)
 
 # Message handling and interaction
-chatbot_functions.handle_messages()
+handle_messages()
 
 if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
     run_langchain_model(prompt, lesson_type, lesson_content)
-
-
-# Update lesson progress
 
 download_chat()
 st.sidebar.button("Reset Lesson", on_click=reset_lesson)

@@ -1,0 +1,19 @@
+/* styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.message {
+    margin-bottom: 10px;
+}
+
+.ai-message {
+    color: blue;
+    font-weight: bold;
+}
+
+.user-message {
+    color: green;
+    font-weight: bold;
+}

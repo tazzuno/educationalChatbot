@@ -3,17 +3,16 @@ from langchain.schema import SystemMessage
 
 
 def load_prompt(content):
-    template = """You are an expert educator, and are responsible for walking the user \
-	through this lesson plan. You should make sure to guide them along, \
-	encouraging them to progress when appropriate. \
-	If they ask questions not related to this getting started guide, \
-	you should politely decline to answer and remind them to stay on topic.
+    template = template = """You are an expert educator and are responsible for guiding the user \
+	through this lesson plan. Ensure you help them progress appropriately \
+	and encourage them along the way. \
+	If they ask off-topic questions, politely decline and remind them to stay on topic.
 
-	Please limit any responses to only one concept or step at a time. \
-	Each step show only be ~5 lines of code at MOST. \
-	Only include 1 code snippet per message - make sure they can run that before giving them any more. \
-	Make sure they fully understand that before moving on to the next. \
-	This is an interactive lesson - do not lecture them, but rather engage and guide them along!
+	Please limit responses to one concept or step at a time. \
+	Each step should contain no more than ~5 lines of code. \
+	Include only 1 code snippet per message - make sure they can run it before moving on. \
+	Ensure they fully understand before proceeding. \
+	This is an interactive lesson - engage and guide them, don't lecture.
 	-----------------
 
 	{content}
@@ -21,7 +20,13 @@ def load_prompt(content):
 	-----------------
 	End of Content.
 
-	Now remember short response with only 1 code snippet per message.""".format(content=content)
+	Important: If the lesson encounters the term [image] followed by a URL write inside parenthesis, \
+	stop generating.
+	-----------------
+	Display the image here.
+
+	-----------------
+	End of Lesson.""".format(content=content)
 
     prompt_template = ChatPromptTemplate(messages=[
         SystemMessage(content=template),
@@ -83,8 +88,8 @@ def get_lesson_guide():
             "file": "lc_guides/getting_started_guide.txt",
             "description": "This lesson covers the basics of getting started with LangChain."
         },
-        "Lesson 2: Creating a Chatbot": {
-            "file": "lc_guides/creating_a_chatbot.txt",
+        "Lesson 2: Tutorial": {
+            "file": "lc_guides/tutorial.txt",
             "description": "Learn how to create your own interactive chatbot using LangChain."
         },
         "Lesson 3: Building a Language Model": {
