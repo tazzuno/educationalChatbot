@@ -1,7 +1,14 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 import secrets
+<<<<<<< HEAD
 import re
+=======
+import bcrypt
+import re
+import mysql.connector
+from mysql.connector import Error
+>>>>>>> origin/master
 
 # Credenziali
 credentials = {'usernames': {'user1': 'pass123'}}
@@ -18,6 +25,23 @@ login_manager = stauth.Authenticate(credentials,
 validated_password = ""
 
 
+<<<<<<< HEAD
+=======
+def connetti_database():
+    try:
+        # Recupera le informazioni di connessione dal file secrets
+        return mysql.connector.connect(**st.secrets["mysql"])
+    except Exception as e:
+        st.error(f"Errore di connessione al database: {e}")
+        return None
+
+
+def chiudi_connessione_database(connection):
+    if connection and connection.is_connected():
+        connection.close()
+
+
+>>>>>>> origin/master
 def validate_password(password):
     global validated_password
 
@@ -40,7 +64,32 @@ def validate_password(password):
     return validated_password
 
 
+<<<<<<< HEAD
 def app():
+=======
+def aggiungi_utente_al_database(username, password, email, api_key, connection):
+    if connection:
+        try:
+            cursor = connection.cursor()
+
+            # Aggiungi l'utente al database
+            salt = bcrypt.gensalt()
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+            query = "INSERT INTO Utenti (Username, Password, Email, API_key) VALUES (%s, %s, %s, %s)"
+            data = (username, hashed_password, email, api_key)
+            cursor.execute(query, data)
+            connection.commit()
+            print("Utente aggiunto con successo!")
+
+        except Error as e:
+            print(f"Errore durante l'aggiunta dell'utente al database: {e}")
+        finally:
+            chiudi_connessione_database(connection)
+
+
+def app():
+    connection = connetti_database()
+>>>>>>> origin/master
     choice = st.sidebar.selectbox("Choice", ["Login", "Register"])
 
     if choice == "Login":
@@ -49,13 +98,18 @@ def app():
         password = st.text_input("Password", type="password")
 
         if st.button("Login"):
+<<<<<<< HEAD
             if login_manager.login(username, password):
+=======
+            if login_manager.authenticate(username, password):
+>>>>>>> origin/master
                 st.success("Login effettuato")
             else:
                 st.error("Credenziali non valide")
 
     elif choice == "Register":
 
+<<<<<<< HEAD
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
 
@@ -66,8 +120,24 @@ def app():
             if st.button("Register") and validated_password == confirm_password:
                 credentials['usernames'][username] = validated_password
                 st.success("Registrato!")
+=======
+        email = st.text_input("Email")
+        username = st.text_input("Username")
+        api_key = st.text_input("API KEY (CHAT-GPT)")
+        password = st.text_input("Password", type="password")
+
+        if validate_password(password):
+            confirm_password = st.text_input("Confirm Password")
+
+            if st.button("Register") and validated_password == confirm_password:
+                aggiungi_utente_al_database(username, password, email, api_key, connection)
+                st.success("Utente registrato!")
+>>>>>>> origin/master
 
 
 if __name__ == '__main__':
     app()
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
