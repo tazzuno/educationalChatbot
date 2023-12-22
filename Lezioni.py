@@ -96,6 +96,20 @@ def setup_page():
     st.set_page_config(page_title="LangChain: Getting Started Class", page_icon="🦜")
     st.title("🦜 LangChain: Getting Started Class")
 
+def avanzamento_barra():
+    #inizializzazione variabili
+    bar = st.progress(0)
+    bar.empty()
+    contatore = 0
+
+    messages = st.session_state.get("messages", [])
+    for msg in messages:
+        if isinstance(msg, AIMessage):
+            if (msg.content.startswith("Hai risposto correttamente!") or msg.content.startswith("That's correct!")):
+                contatore += 1
+    progresso = contatore * 10
+    bar = st.sidebar.progress(progresso, "Punteggio")
+    time.sleep(1)
 
 # Main Streamlit Code
 setup_page()
@@ -133,3 +147,11 @@ if prompt := st.chat_input():
 
 download_chat()
 st.sidebar.button("Reset Lesson", on_click=reset_lesson)
+
+container_checkbox = st.sidebar.container()
+container_button = st.empty()
+
+if st.sidebar.checkbox('Show Progress'):
+    container_button.empty()
+    container_centrale = avanzamento_barra()
+else: container_centrale = st.empty()
