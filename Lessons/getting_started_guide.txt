@@ -59,6 +59,13 @@ In this extensive course, we will delve into the fundamentals of Python programm
 **What is Python?**
 Python is a versatile, high-level programming language known for its readability and simplicity. It supports multiple programming paradigms and is widely used in various domains, including web development, data science, artificial intelligence, and more.
 
+Now you're going to see the Python Logo
+
+Print Image with st.image
+'''st.image
+lc_guides/python.png
+'''
+
 **Python's Popularity and Use Cases:**
 - Python's role in web development, data analysis, machine learning, and automation.
 - Popularity among developers and the open-source community.
