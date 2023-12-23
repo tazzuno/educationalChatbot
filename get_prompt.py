@@ -66,27 +66,31 @@ def load_prompt_with_questions(content):
     return prompt_template
 
 
-def get_lesson_guide():
-    lesson_guides = {
-        "Chapter 1: Software Requirements": {
-            "file": "Lessons/Lesson1.txt",
-            "description": "This lesson covers the basics of getting started with LangChain."
-        },
-        "Chapter 2: Software Design": {
-            "file": "Lessons/Lesson2.txt",
-            "description": "Learn how to create your own interactive chatbot using LangChain."
-        },
-        "Chapter 3: Software Construction": {
-            "file": "Lessons/Lesson3.txt",
-            "description": "Explore the process of building a language model with LangChain."
-        },
-        "Lesson 4: Generating Creative Text Formats": {
-            "file": "Lessons/generating_creative_text_formats.txt",
-            "description": "Discover how to generate various creative text formats using LangChain."
-        },
-        "Lesson 5: Deploying Your LangChain Model": {
-            "file": "Lessons/deploying_your_langchain_model.txt",
-            "description": "Learn how to deploy your LangChain model to make it accessible to others."
-        }
-    }
+def get_lesson_guide(connection):
+    cursor = connection.cursor()
+
+    lesson_guides = {}
+    query = "SELECT id, nome, descrizione, path FROM Lezioni"
+
+    try:
+        cursor.execute(query)
+
+        # Estrai i risultati
+        results = cursor.fetchall()
+
+        # Itera attraverso i risultati e aggiungi le informazioni a lesson_guides
+        for result in results:
+            id_lezione, nome_lezione, descrizione, percorso_file = result
+            lesson_guides[nome_lezione] = {
+                "id": id_lezione,
+                "description": descrizione,
+                "file": percorso_file
+
+            }
+    except Exception as e:
+        print(f"Errore durante l'esecuzione della query: {e}")
+
+    # Stampa la struttura dati aggiornata
+    print(lesson_guides)
+
     return lesson_guides

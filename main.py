@@ -45,7 +45,7 @@ def lezioni(connection):
     st.title('Lezioni')
     lz.setup_page()
 
-    lesson_selection = st.sidebar.selectbox("Select Lesson", list(lz.get_prompt.get_lesson_guide().keys()))
+    lesson_selection = st.sidebar.selectbox("Select Lesson", list(lz.get_prompt.get_lesson_guide(connection).keys()))
 
     cursor = connection.cursor()
 
@@ -57,7 +57,7 @@ def lezioni(connection):
     # Estrai i risultati
     api_key = cursor.fetchall()[0][0]
 
-    lesson_info = lz.get_prompt.get_lesson_guide()[lesson_selection]
+    lesson_info = lz.get_prompt.get_lesson_guide(connection)[lesson_selection]
     lesson_content = lz.load_lesson_content(lesson_info["file"])
 
     lesson_type = st.sidebar.radio("Select Lesson Type",
