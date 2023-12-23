@@ -4,10 +4,11 @@ import Authentication as aut
 import Lezioni as lz
 import streamlit as st
 
+connection = aut.connetti_database()
 
-def autenticazione():
+
+def autenticazione(connection):
     st.title('Autenticazione')
-    connection = aut.connetti_database()
     choice = st.sidebar.selectbox("Choice", ["Login", "Register"])
 
     if choice == "Login":
@@ -18,6 +19,7 @@ def autenticazione():
         if st.button("Login"):
             if aut.verifica_credenziali(username, password, connection):
                 st.success("Login effettuato")
+                st.session_state.username = username
                 st.session_state.pagina_corrente = 'Lezioni'
             else:
                 st.error("Credenziali non valide")
@@ -39,11 +41,22 @@ def autenticazione():
                 st.error("Le password inserite non coincidono")
 
 
-def lezioni():
+def lezioni(connection):
     st.title('Lezioni')
     lz.setup_page()
 
     lesson_selection = st.sidebar.selectbox("Select Lesson", list(lz.get_prompt.get_lesson_guide().keys()))
+
+    cursor = connection.cursor()
+
+    query = "SELECT API_key FROM utenti WHERE username = %s"
+    values = (st.session_state.username,)
+
+    cursor.execute(query, values)
+
+    # Estrai i risultati
+    api_key = cursor.fetchall()[0][0]
+
     lesson_info = lz.get_prompt.get_lesson_guide()[lesson_selection]
     lesson_content = lz.load_lesson_content(lesson_info["file"])
 
@@ -64,7 +77,7 @@ def lezioni():
 
     if prompt := st.chat_input():
         st.chat_message("user").write(prompt)
-        lz.run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection)
+        lz.run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection, api_key)
 
     lz.download_chat()
     st.sidebar.button("Reset Lesson", on_click=lz.reset_lesson)
@@ -83,6 +96,6 @@ if 'pagina_corrente' not in st.session_state:
 
 # Mostra la pagina corrente
 if st.session_state.pagina_corrente == 'Autenticazione':
-    autenticazione()
+    autenticazione(connection)
 elif st.session_state.pagina_corrente == 'Lezioni':
-    lezioni()
+    lezioni(connection)

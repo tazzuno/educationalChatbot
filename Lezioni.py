@@ -27,11 +27,9 @@ def display_lesson(lesson_selection, lesson_info):
         st.write(lesson_info["description"])
 
 
-def run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection):
+def run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection, openai_api_key):
     try:
-        # Load the OpenAI API key from a .env file
-        load_dotenv(find_dotenv('secrets.env'))
-        openai_api_key = os.getenv("SECRET_KEY")
+
 
         # Set up a streaming handler for the model
         with st.chat_message("assistant"):
