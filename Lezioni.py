@@ -21,7 +21,13 @@ def handle_messages():
             st.chat_message("assistant").write(msg.content)
 
 
-def run_langchain_model(prompt, lesson_type, lesson_content):
+def display_lesson(lesson_selection, lesson_info):
+    with st.container():
+        st.markdown(f"**{lesson_selection}**")
+        st.write(lesson_info["description"])
+
+
+def run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection):
     try:
         # Load the OpenAI API key from a .env file
         load_dotenv(find_dotenv('secrets.env'))
@@ -115,52 +121,48 @@ def avanzamento_barra():
     time.sleep(1)
 
 
-# Main Streamlit Code
-setup_page()
+def load_lesson_content(lesson_file):
+    try:
+        with open(lesson_file, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        st.error(f"Error: Lesson file not found at {lesson_file}")
+        st.stop()
 
-# Lesson selection dictionary
-lesson_selection = st.sidebar.selectbox("Select Lesson", list(get_prompt.get_lesson_guide().keys()))
 
-# Display lesson content and description based on selection
-lesson_info = get_prompt.get_lesson_guide()[lesson_selection]
+def main():
+    setup_page()
 
-# Open the lesson file and decode it using UTF-8 encoding
-with open(lesson_info["file"], encoding="utf-8") as f:
-    lesson_content = f.read()
+    lesson_selection = st.sidebar.selectbox("Select Lesson", list(get_prompt.get_lesson_guide().keys()))
+    lesson_info = get_prompt.get_lesson_guide()[lesson_selection]
+    lesson_content = load_lesson_content(lesson_info["file"])
 
-lesson_description = lesson_info["description"]
+    lesson_type = st.sidebar.radio("Select Lesson Type",
+                                   ["Instructions based lesson", "Interactive lesson with questions"])
 
-# Radio buttons for lesson type selection
-lesson_type = st.sidebar.radio("Select Lesson Type", ["Instructions based lesson", "Interactive lesson with questions"])
+    if st.session_state.get("current_lesson") != lesson_selection or st.session_state.get(
+            "current_lesson_type") != lesson_type:
+        st.session_state["current_lesson"] = lesson_selection
+        st.session_state["current_lesson_type"] = lesson_type
+        st.session_state["messages"] = [AIMessage(
+            content="Benvenuto! Sono AiDe, il tuo assistente virtuale che ti guiderà nell'apprendimento "
+                    "dell'ingegneria del software. Scrivimi un messaggio non appena sei pronto per iniziare!"
+        )]
 
-# Clear chat session if dropdown option or radio button changes
-if st.session_state.get("current_lesson") != lesson_selection or st.session_state.get(
-        "current_lesson_type") != lesson_type:
-    st.session_state["current_lesson"] = lesson_selection
-    st.session_state["current_lesson_type"] = lesson_type
-    st.session_state["messages"] = [AIMessage(
-        content="Benvenuto! Sono AiDe, il tuo assistente virtuale che ti guiderà nell'apprendimento dell'ingegneria "
-                "del software. Scrivimi un messaggio non appena sei pronto per iniziare!")]
+    display_lesson(lesson_selection, lesson_info)
+    handle_messages()
 
-# Display lesson name and description
-st.markdown(f"**{lesson_selection}**")
-st.write(lesson_description)
+    if prompt := st.chat_input():
+        st.chat_message("user").write(prompt)
+        run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection)
 
-# Message handling and interaction
-handle_messages()
+    download_chat()
+    st.sidebar.button("Reset Lesson", on_click=reset_lesson)
+    container_checkbox = st.sidebar.container()
+    container_button = st.empty()
 
-if prompt := st.chat_input():
-    st.chat_message("user").write(prompt)
-    run_langchain_model(prompt, lesson_type, lesson_content)
-
-# Reset button for clearing the chat session
-download_chat()
-st.sidebar.button("Reset Lesson", on_click=reset_lesson)
-container_checkbox = st.sidebar.container()
-container_button = st.empty()
-
-if st.sidebar.checkbox('Show Progress'):
-    container_button.empty()
-    container_centrale = avanzamento_barra()
-else:
-    container_centrale = st.empty()
+    if st.sidebar.checkbox('Show Progress'):
+        container_button.empty()
+        container_centrale = avanzamento_barra()
+    else:
+        container_centrale = st.empty()
