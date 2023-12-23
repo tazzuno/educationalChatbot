@@ -101,7 +101,7 @@ def reset_lesson():
 
 
 def setup_page():
-    st.set_page_config(page_title="LangChain: Getting Started Class", page_icon="🦜")
+    #st.set_page_config(page_title="LangChain: Getting Started Class", page_icon="🦜")
     st.title("🦜 LangChain: Getting Started Class")
 
 

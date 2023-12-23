@@ -10,7 +10,7 @@ def load_prompt(content):
     politely decline and remind them to stay on topic. Please limit responses to one concept or step at a time. Each 
     step should contain no more than ~5 lines. Ensure they fully understand before proceeding. This is an interactive 
     lesson - engage and guide them, don't lecture. ----------------- {content} ----------------- End of Content.
-    
+
     End of Lesson."""
                            .format(content=content))
 
