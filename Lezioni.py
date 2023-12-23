@@ -1,4 +1,6 @@
 import os
+import time
+
 import streamlit as st
 from dotenv import load_dotenv, find_dotenv
 from langchain.chains import LLMChain
@@ -96,8 +98,9 @@ def setup_page():
     st.set_page_config(page_title="LangChain: Getting Started Class", page_icon="🦜")
     st.title("🦜 LangChain: Getting Started Class")
 
+
 def avanzamento_barra():
-    #inizializzazione variabili
+    # inizializzazione variabili
     bar = st.progress(0)
     bar.empty()
     contatore = 0
@@ -105,11 +108,12 @@ def avanzamento_barra():
     messages = st.session_state.get("messages", [])
     for msg in messages:
         if isinstance(msg, AIMessage):
-            if (msg.content.startswith("Hai risposto correttamente!") or msg.content.startswith("That's correct!")):
+            if msg.content.startswith("Hai risposto correttamente!") or msg.content.startswith("That's correct!"):
                 contatore += 1
     progresso = contatore * 10
     bar = st.sidebar.progress(progresso, "Punteggio")
     time.sleep(1)
+
 
 # Main Streamlit Code
 setup_page()
@@ -119,7 +123,11 @@ lesson_selection = st.sidebar.selectbox("Select Lesson", list(get_prompt.get_les
 
 # Display lesson content and description based on selection
 lesson_info = get_prompt.get_lesson_guide()[lesson_selection]
-lesson_content = get_lesson_content(lesson_info["file"])
+
+# Open the lesson file and decode it using UTF-8 encoding
+with open(lesson_info["file"], encoding="utf-8") as f:
+    lesson_content = f.read()
+
 lesson_description = lesson_info["description"]
 
 # Radio buttons for lesson type selection
@@ -131,8 +139,8 @@ if st.session_state.get("current_lesson") != lesson_selection or st.session_stat
     st.session_state["current_lesson"] = lesson_selection
     st.session_state["current_lesson_type"] = lesson_type
     st.session_state["messages"] = [AIMessage(
-        content="Welcome! This short course will help you get started with LangChain. Let me know when you're all set "
-                "to jump in!")]
+        content="Benvenuto! Sono AiDe, il tuo assistente virtuale che ti guiderà nell'apprendimento dell'ingegneria "
+                "del software. Scrivimi un messaggio non appena sei pronto per iniziare!")]
 
 # Display lesson name and description
 st.markdown(f"**{lesson_selection}**")
@@ -145,13 +153,14 @@ if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
     run_langchain_model(prompt, lesson_type, lesson_content)
 
+# Reset button for clearing the chat session
 download_chat()
 st.sidebar.button("Reset Lesson", on_click=reset_lesson)
-
 container_checkbox = st.sidebar.container()
 container_button = st.empty()
 
 if st.sidebar.checkbox('Show Progress'):
     container_button.empty()
     container_centrale = avanzamento_barra()
-else: container_centrale = st.empty()
+else:
+    container_centrale = st.empty()
