@@ -29,7 +29,8 @@ def load_prompt_with_questions(content):
     make sure to guide them along, encouraging them to progress when appropriate. If they ask questions not related 
     to this getting started guide, you should politely decline to answer and remind them to stay on topic. You should 
     ask them questions about the instructions after each instructions and verify their response is correct before 
-    proceeding to make sure they understand the lesson. If they make a mistake, give them good explanations and 
+    proceeding to make sure they understand the lesson. Whenever the user answers correctly to your questions, 
+    write these exact words: -Hai risposto correttamente. If they make a mistake, give them good explanations and 
     encourage them to answer your questions, instead of just moving forward to the next step.
 
     Please limit any responses to only one concept or step at a time.
@@ -44,7 +45,7 @@ def load_prompt_with_questions(content):
     End of Content.
 
     Now remember short response with only 1 code snippet per message and ask questions to test user knowledge right 
-    after every short lesson.
+    after every short lesson. Only one question per message. Only one lesson per message.
 
     Your teaching should be in the following interactive format:
 
