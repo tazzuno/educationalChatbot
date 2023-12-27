@@ -120,37 +120,4 @@ def verifica_credenziali(username, password, connection):
             chiudi_connessione_database(connection)
 
 
-def app():
-    connection = connetti_database()
-    choice = st.sidebar.selectbox("Choice", ["Login", "Register"])
 
-    if choice == "Login":
-
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-
-        if st.button("Login"):
-            if verifica_credenziali(username, password, connection):
-                st.success("Login effettuato")
-            else:
-                st.error("Credenziali non valide")
-
-    elif choice == "Register":
-
-        email = st.text_input("Email")
-        username = st.text_input("Username")
-        api_key = st.text_input("OPENAI API-KEY", type="password")
-        password = st.text_input("Password", type="password")
-
-        if validate_password(password) and is_api_key_valid(api_key):
-            confirm_password = st.text_input("Confirm Password")
-
-            if st.button("Register") and validated_password == confirm_password:
-                aggiungi_utente_al_database(username, password, email, api_key, connection)
-                st.success("Utente registrato!")
-            elif validated_password != confirm_password:
-                st.error("Le password inserite non coincidono")
-
-
-if __name__ == '__main__':
-    app()

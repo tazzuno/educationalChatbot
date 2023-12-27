@@ -1,3 +1,4 @@
+import streamlit
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder, HumanMessagePromptTemplate
 from langchain.schema import SystemMessage
 
@@ -34,7 +35,7 @@ def load_prompt_with_questions(content):
     encourage them to answer your questions, instead of just moving forward to the next step.
 
     Please limit any responses to only one concept or step at a time.
-    Each step show only be ~10 lines at MOST.
+    Each step show only be ~15 lines at MOST.
     Make sure they fully understand that before moving on to the next. 
     This is an interactive lesson - do not lecture them, but rather engage and guide them along!
     -----------------
@@ -70,10 +71,11 @@ def get_lesson_guide(connection):
     cursor = connection.cursor()
 
     lesson_guides = {}
-    query = "SELECT id, nome, descrizione, path FROM Lezioni"
+    query = "SELECT id, nome, descrizione, percorso_file FROM Lezioni where username= %s "
+    values = (streamlit.session_state.username,)
 
     try:
-        cursor.execute(query)
+        cursor.execute(query, values)
 
         # Estrai i risultati
         results = cursor.fetchall()
@@ -89,8 +91,5 @@ def get_lesson_guide(connection):
             }
     except Exception as e:
         print(f"Errore durante l'esecuzione della query: {e}")
-
-    # Stampa la struttura dati aggiornata
-    print(lesson_guides)
 
     return lesson_guides

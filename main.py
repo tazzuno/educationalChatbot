@@ -1,5 +1,7 @@
 from langchain_core.messages import AIMessage
 
+from PIL import Image
+import io
 import Authentication as aut
 import Lezioni as lz
 import streamlit as st
@@ -8,7 +10,12 @@ connection = aut.connetti_database()
 
 
 def autenticazione(connection):
+    st.session_state.username=None
+    lz.reset_lesson()
     st.title('Autenticazione')
+
+    st.sidebar.image("logo.svg", use_column_width=True)
+
     choice = st.sidebar.selectbox("Choice", ["Login", "Register"])
 
     if choice == "Login":
@@ -42,8 +49,13 @@ def autenticazione(connection):
 
 
 def lezioni(connection):
+
     st.title('Lezioni')
     lz.setup_page()
+
+    st.sidebar.image("logo.svg", use_column_width=True)
+    if st.sidebar.button("Logout"):
+        st.session_state.pagina_corrente = 'Autenticazione'
 
     lesson_selection = st.sidebar.selectbox("Select Lesson", list(lz.get_prompt.get_lesson_guide(connection).keys()))
 
@@ -68,18 +80,21 @@ def lezioni(connection):
         st.session_state["current_lesson"] = lesson_selection
         st.session_state["current_lesson_type"] = lesson_type
         st.session_state["messages"] = [AIMessage(
-            content="Benvenuto! Sono AiDe, il tuo assistente virtuale che ti guiderà nell'apprendimento "
-                    "dell'ingegneria del software. Scrivimi un messaggio non appena sei pronto per iniziare!"
+            content="Benvenuto " + str(st.session_state.username) + "! Sono AiDe, il tuo assistente virtuale che ti "
+                                                                    "guiderà nell'apprendimento"
+                    " dell'ingegneria del software. Scrivimi un messaggio non appena sei pronto per iniziare!"
         )]
 
     lz.display_lesson(lesson_selection, lesson_info)
     lz.handle_messages()
+
 
     if prompt := st.chat_input():
         st.chat_message("user").write(prompt)
         lz.run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection, api_key)
 
     lz.download_chat()
+
     st.sidebar.button("Reset Lesson", on_click=lz.reset_lesson)
     container_checkbox = st.sidebar.container()
     container_button = st.empty()
@@ -90,12 +105,19 @@ def lezioni(connection):
     else:
         container_centrale = st.empty()
 
+    print(str(api_key))
+
+
+
+###################################################################
 
 if 'pagina_corrente' not in st.session_state:
     st.session_state.pagina_corrente = 'Autenticazione'
 
 # Mostra la pagina corrente
-if st.session_state.pagina_corrente == 'Autenticazione':
+if st.session_state.get('pagina_corrente') == 'Autenticazione':
     autenticazione(connection)
-elif st.session_state.pagina_corrente == 'Lezioni':
+elif st.session_state.get('pagina_corrente') == 'Lezioni':
     lezioni(connection)
+
+

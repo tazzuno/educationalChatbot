@@ -1,13 +1,40 @@
-import os
+import tempfile
 import time
-
+import os
+from bs4 import BeautifulSoup
 import streamlit as st
-from dotenv import load_dotenv, find_dotenv
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 import get_prompt
 from langchain.schema import AIMessage, HumanMessage
 from StreamHandler import StreamHandler
+
+
+def upload_chat():
+    uploaded_file = st.file_uploader("Upload Chat HTML", type="html")
+
+    if uploaded_file:
+        content = uploaded_file.read()
+        messages = parse_chat_html(content)
+        st.session_state.messages = messages
+        st.success("Chat loaded successfully!")
+
+
+def parse_chat_html(html_content):
+    soup = BeautifulSoup(html_content, "html.parser")
+    messages = []
+
+    for p_tag in soup.find_all("p", class_="message"):
+        strong_tag = p_tag.find("strong")
+        if strong_tag:
+            if strong_tag.text == "AI:":
+                messages.append(AIMessage(p_tag.text[len("AI:"):].strip()))
+            elif strong_tag.text == "User:":
+                messages.append(HumanMessage(p_tag.text[len("User:"):].strip()))
+            else:
+                st.warning(f"Unknown message type: {strong_tag.text}")
+
+    return messages
 
 
 def handle_messages():
@@ -29,7 +56,6 @@ def display_lesson(lesson_selection, lesson_info):
 
 def run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection, openai_api_key):
     try:
-
 
         # Set up a streaming handler for the model
         with st.chat_message("assistant"):
@@ -99,8 +125,8 @@ def reset_lesson():
 
 
 def setup_page():
-    #st.set_page_config(page_title="LangChain: Getting Started Class", page_icon="🦜")
-    st.title("🦜 LangChain: Getting Started Class")
+    # st.set_page_config(page_title="LangChain: Getting Started Class", page_icon="🦜")
+    st.title("AIDE: Getting Started Class with your Study Assinstant")
 
 
 def avanzamento_barra():
@@ -126,41 +152,3 @@ def load_lesson_content(lesson_file):
     except FileNotFoundError:
         st.error(f"Error: Lesson file not found at {lesson_file}")
         st.stop()
-
-
-def main():
-    setup_page()
-
-    lesson_selection = st.sidebar.selectbox("Select Lesson", list(get_prompt.get_lesson_guide().keys()))
-    lesson_info = get_prompt.get_lesson_guide()[lesson_selection]
-    lesson_content = load_lesson_content(lesson_info["file"])
-
-    lesson_type = st.sidebar.radio("Select Lesson Type",
-                                   ["Instructions based lesson", "Interactive lesson with questions"])
-
-    if st.session_state.get("current_lesson") != lesson_selection or st.session_state.get(
-            "current_lesson_type") != lesson_type:
-        st.session_state["current_lesson"] = lesson_selection
-        st.session_state["current_lesson_type"] = lesson_type
-        st.session_state["messages"] = [AIMessage(
-            content="Benvenuto! Sono AiDe, il tuo assistente virtuale che ti guiderà nell'apprendimento "
-                    "dell'ingegneria del software. Scrivimi un messaggio non appena sei pronto per iniziare!"
-        )]
-
-    display_lesson(lesson_selection, lesson_info)
-    handle_messages()
-
-    if prompt := st.chat_input():
-        st.chat_message("user").write(prompt)
-        run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection)
-
-    download_chat()
-    st.sidebar.button("Reset Lesson", on_click=reset_lesson)
-    container_checkbox = st.sidebar.container()
-    container_button = st.empty()
-
-    if st.sidebar.checkbox('Show Progress'):
-        container_button.empty()
-        container_centrale = avanzamento_barra()
-    else:
-        container_centrale = st.empty()
