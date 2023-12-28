@@ -8,6 +8,15 @@ from StreamHandler import StreamHandler
 
 
 def handle_messages():
+    """Gestisce i messaggi della chat.
+
+    Inizializza lo stato della sessione. Se "messages" non è presente in st.session_state,
+    lo inizializza a una lista vuota. Successivamente, gestisce i messaggi presenti in
+    st.session_state["messages"], scrivendo i messaggi degli utenti e dell'assistente
+    nella chat.
+
+    """
+    
     # Initialize session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -19,6 +28,17 @@ def handle_messages():
 
 
 def display_lesson(lesson_selection, lesson_info):
+    """Visualizza una lezione specifica.
+
+    Parameters:
+    lesson_selection (str): Il titolo o la selezione della lezione da visualizzare.
+    lesson_info (dict): Un dizionario contenente le informazioni sulla lezione, con la chiave "description" per la descrizione.
+
+    Returns:
+    None
+
+    """
+    
     with st.container():
         st.markdown(f"**{lesson_selection}**")
         st.write(lesson_info["description"])
