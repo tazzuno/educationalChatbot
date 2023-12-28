@@ -23,12 +23,6 @@ validated_password = ""
 
 
 def connetti_database():
-  """Connette al database MySQL utilizzando le informazioni di connessione fornite nei secrets di Streamlit.
-
-        Returns:
-        mysql.connector.connection.MySQLConnection or None: Una connessione al database MySQL se la connessione è
-        riuscita con successo, altrimenti None.
-  """
     try:
         # Recupera le informazioni di connessione dal file secrets
         return mysql.connector.connect(**st.secrets["mysql"])
@@ -38,33 +32,11 @@ def connetti_database():
 
 
 def chiudi_connessione_database(connection):
-  """Chiude la connessione al database MySQL se è attiva e aperta.
-
-        Parameters:
-            connection (mysql.connector.connection.MySQLConnection): La connessione al database MySQL da chiudere.
-
-        Notes:
-            La funzione controlla se la connessione è attiva e aperta prima di chiuderla.
-  """
     if connection and connection.is_connected():
         connection.close()
 
 
 def validate_password(password):
-  """Valida una password secondo determinati criteri.
-
-        Parameters:
-            password (str): La password da validare.
-
-        Returns:
-            str or None: La password validata se rispetta i criteri, altrimenti None.
-
-        Notes:
-            La funzione verifica se la password soddisfa i seguenti criteri:
-            - Deve essere lunga almeno 8 caratteri.
-            - Deve contenere almeno una lettera maiuscola.
-            - Deve contenere almeno un carattere speciale tra !, @, # o $.
-  """
     global validated_password
 
     if len(password) > 0:
@@ -89,18 +61,6 @@ def validate_password(password):
 
 
 def is_api_key_valid(key):
-  """Verifica la validità di una chiave API di OpenAI eseguendo una richiesta di completamento.
-
-        Parameters:
-            key (str): La chiave API da verificare.
-
-        Returns:
-            bool or str: True se la chiave API è valida, altrimenti False o una stringa che rappresenta l'errore.
-
-        Notes:
-            La funzione imposta la chiave API fornita e tenta di eseguire una richiesta di completamento
-            utilizzando OpenAI's Completion API con un'istanza di motore "davinci".
-  """
     try:
         openai.api_key = key
         response = openai.Completion.create(
@@ -116,18 +76,6 @@ def is_api_key_valid(key):
 
 
 def aggiungi_utente_al_database(username, password, email, api_key, connection):
-  """Aggiunge un nuovo utente al database.
-
-        Parameters:
-            username (str): Il nome utente dell'utente da aggiungere.
-            password (str): La password dell'utente da aggiungere.
-            email (str): L'email dell'utente da aggiungere.
-            api_key (str): La chiave API dell'utente da aggiungere.
-            connection (mysql.connector.connection.MySQLConnection): La connessione al database MySQL.
-
-        Notes:
-            La funzione esegue l'hash della password fornita prima di salvarla nel database.
-  """
     if connection:
         try:
             cursor = connection.cursor()
@@ -148,19 +96,6 @@ def aggiungi_utente_al_database(username, password, email, api_key, connection):
 
 
 def verifica_credenziali(username, password, connection):
-  """Verifica le credenziali di accesso di un utente nel database.
-
-        Parameters:
-            username (str): Il nome utente dell'utente da verificare.
-            password (str): La password dell'utente da verificare.
-            connection (mysql.connector.connection.MySQLConnection): La connessione al database MySQL.
-
-        Returns:
-            int: 1 se le credenziali sono valide, altrimenti 0.
-
-        Notes:
-            La funzione esegue una query per controllare se le credenziali fornite corrispondono a un utente nel database.
-  """
     if connection:
         try:
             cursor = connection.cursor()

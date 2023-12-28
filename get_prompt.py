@@ -4,22 +4,9 @@ from langchain.schema import SystemMessage
 
 
 def load_prompt(content):
-    """Crea un modello di prompt per una lezione interattiva.
-
-        Parameters:
-            content (str): Il contenuto della lezione da includere nel prompt.
-
-        Returns:
-            langchain.templates.ChatPromptTemplate: Il modello di prompt creato per la lezione.
-
-        Notes:
-            La funzione crea un modello di prompt per guidare una lezione interattiva di ingegneria del software.
-            Include istruzioni per l'educatore su come guidare l'utente attraverso la lezione.
-    """
-    
     template = template = (""""I want you to act as a university software engineering professor delivering engaging 
     and concise lectures to Italian students. Your expertise lies in explaining SWEBOK chapters in English to your 
-    students in Italian.You are an expert educator and are responsible for guiding the user through this lesson plan. 
+    students in Italian. You are an expert educator and are responsible for guiding the user through this lesson plan. 
     Ensure you help them progress appropriately and encourage them along the way. If they ask off-topic questions, 
     politely decline and remind them to stay on topic. Please limit responses to one concept or step at a time. Each 
     step should contain no more than ~5 lines. Ensure they fully understand before proceeding. This is an interactive 
@@ -37,19 +24,6 @@ def load_prompt(content):
 
 
 def load_prompt_with_questions(content):
-    """Crea un modello di prompt interattivo con domande per una lezione.
-
-        Parameters:
-            content (str): Il contenuto della lezione da includere nel prompt.
-
-        Returns:
-            langchain.templates.ChatPromptTemplate: Il modello di prompt creato per la lezione con domande.
-
-        Notes:
-            La funzione crea un modello di prompt per una lezione interattiva in cui vengono fornite delle domande
-            all'utente dopo ogni breve lezione. Si aspetta risposte corrette dall'utente prima di procedere.
-    """
-    
     template = """"I want you to act as a university software engineering professor delivering engaging and concise 
     lectures to Italian students. Your expertise lies in explaining SWEBOK chapters in English to your students in 
     Italian.You are an expert educator, and are responsible for walking the user through this lesson plan. You should 
@@ -94,19 +68,6 @@ def load_prompt_with_questions(content):
 
 
 def get_lesson_guide(connection):
-    """Ottiene la guida delle lezioni per l'utente loggato dal database.
-
-        Parameters:
-            connection (mysql.connector.connection.MySQLConnection): La connessione al database MySQL.
-
-        Returns:
-            dict: Un dizionario contenente le informazioni delle lezioni per l'utente.
-
-        Notes:
-            La funzione esegue una query per ottenere le informazioni delle lezioni disponibili per l'utente loggato.
-            Le informazioni includono l'ID della lezione, il nome, la descrizione e il percorso del file.
-    """
-    
     cursor = connection.cursor()
 
     lesson_guides = {}

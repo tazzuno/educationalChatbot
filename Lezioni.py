@@ -16,7 +16,7 @@ def handle_messages():
     nella chat.
 
     """
-    
+
     # Initialize session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -38,7 +38,7 @@ def display_lesson(lesson_selection, lesson_info):
     None
 
     """
-    
+
     with st.container():
         st.markdown(f"**{lesson_selection}**")
         st.write(lesson_info["description"])
@@ -55,7 +55,7 @@ def run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection, o
     openai_api_key (str): La chiave API di OpenAI per l'accesso al modello.
 
     """
-    
+
     try:
 
         # Set up a streaming handler for the model
@@ -96,7 +96,7 @@ def get_lesson_content(lesson_file):
     str: Il contenuto della lezione.
 
     """
-    
+
     try:
         with open(lesson_file, "r") as f:
             return f.read()
@@ -113,7 +113,7 @@ def download_chat():
     messaggi dell'utente e dell'assistente formattati.
 
     """
-    
+
     messages = st.session_state.get("messages", [])  # Retrieve messages from session state
 
     chat_content = "<html><head><link rel='stylesheet' type='text/css' href='styles.css'></head><body>"
@@ -148,7 +148,7 @@ def save_chat_history(connection, username, lesson_id, chat_history):
     None
 
     """
-    
+
     cursor = connection.cursor()
     query = "INSERT INTO chat_history (username, content, sender, lesson_id) VALUES (%s, %s, %s, %s)"
     values = [(username, message.content, message.sender, lesson_id) for message in chat_history]
@@ -168,7 +168,7 @@ def load_chat_history(connection, username, lesson_id):
     list: Lista dei messaggi della cronologia della chat.
 
     """
-    
+
     cursor = connection.cursor()
     query = "SELECT content, sender FROM chat_history WHERE username = %s AND lesson_id = %s"
     values = (username, lesson_id)
@@ -184,7 +184,7 @@ def reset_lesson():
     consentendo di ripartire da zero in una nuova lezione.
 
     """
-    
+
     st.session_state["messages"] = []
     st.session_state["completed_lessons"] = []
     st.session_state["current_lesson"] = None
@@ -198,30 +198,37 @@ def setup_page():
     Questa funzione configura la pagina dell'applicazione, impostando il titolo e l'icona.
 
     """
-    
-    # st.set_page_config(page_title="LangChain: Getting Started Class", page_icon="🦜")
-    st.title("AIDE: Getting Started Class with your Study Assinstant")
+
+    st.set_page_config(page_title="AIDE", page_icon="🤖")
+    st.title("AIDE: Studiare non è mai stato così facile! Aide è qui per guidarti!")
 
 
-def avanzamento_barra():
+def avanzamento_barra(connection):
     """Gestisce la barra di avanzamento e il punteggio associato ai messaggi.
 
     La funzione controlla i messaggi presenti nello stato della sessione e aggiorna una barra di avanzamento
     nel sidebar in base al numero di messaggi di risposta corretta.
 
     """
-    
+
     # inizializzazione variabili
     bar = st.progress(0)
     bar.empty()
     contatore = 0
+
+    cursor = connection.cursor()
+    query = "SELECT COUNT(*) FROM Lezioni"
+
+    cursor.execute(query)
+    result = cursor.fetchall()
 
     messages = st.session_state.get("messages", [])
     for msg in messages:
         if isinstance(msg, AIMessage):
             if msg.content.startswith("Hai risposto correttamente!") or msg.content.startswith("That's correct!"):
                 contatore += 1
-    progresso = contatore * 10
+    num_lezioni = 100 / result[0][0]
+    progresso = contatore * num_lezioni
     bar = st.sidebar.progress(progresso, "Punteggio")
     time.sleep(1)
 
@@ -239,7 +246,7 @@ def load_lesson_content(lesson_file):
     FileNotFoundError: Se il file della lezione non è trovato.
 
     """
-    
+
     try:
         with open(lesson_file, "r", encoding="utf-8") as f:
             return f.read()

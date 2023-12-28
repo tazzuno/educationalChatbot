@@ -16,7 +16,7 @@ def autenticazione(connection):
 
     st.sidebar.image("logo.svg", use_column_width=True)
 
-    choice = st.sidebar.selectbox("Choice", ["Login", "Register"])
+    choice = st.sidebar.selectbox("Scegli", ["Login", "Registrati"])
 
     if choice == "Login":
 
@@ -31,7 +31,7 @@ def autenticazione(connection):
             else:
                 st.error("Credenziali non valide")
 
-    elif choice == "Register":
+    elif choice == "Registrati":
 
         email = st.text_input("Email")
         username = st.text_input("Username")
@@ -39,7 +39,7 @@ def autenticazione(connection):
         password = st.text_input("Password", type="password")
 
         if aut.validate_password(password) and aut.is_api_key_valid(api_key):
-            confirm_password = st.text_input("Confirm Password")
+            confirm_password = st.text_input("Conferma Password")
 
             if st.button("Register") and aut.validated_password == confirm_password:
                 aut.aggiungi_utente_al_database(username, password, email, api_key, connection)
@@ -57,7 +57,7 @@ def lezioni(connection):
     if st.sidebar.button("Logout"):
         st.session_state.pagina_corrente = 'Autenticazione'
 
-    lesson_selection = st.sidebar.selectbox("Select Lesson", list(lz.get_prompt.get_lesson_guide(connection).keys()))
+    lesson_selection = st.sidebar.selectbox("Seleziona Lezione", list(lz.get_prompt.get_lesson_guide(connection).keys()))
 
     cursor = connection.cursor()
 
@@ -72,8 +72,8 @@ def lezioni(connection):
     lesson_info = lz.get_prompt.get_lesson_guide(connection)[lesson_selection]
     lesson_content = lz.load_lesson_content(lesson_info["file"])
 
-    lesson_type = st.sidebar.radio("Select Lesson Type",
-                                   ["Instructions based lesson", "Interactive lesson with questions"])
+    lesson_type = st.sidebar.radio("Come vuoi svolgere la lezione?",
+                                   ["Lezione interattiva", "Lezione di ripasso con domande"])
 
     if st.session_state.get("current_lesson") != lesson_selection or st.session_state.get(
             "current_lesson_type") != lesson_type:
@@ -95,17 +95,16 @@ def lezioni(connection):
 
     lz.download_chat()
 
-    st.sidebar.button("Reset Lesson", on_click=lz.reset_lesson)
+    st.sidebar.button("Reimposta Lezione", on_click=lz.reset_lesson)
     container_checkbox = st.sidebar.container()
     container_button = st.empty()
 
-    if st.sidebar.checkbox('Show Progress'):
-        container_button.empty()
-        container_centrale = lz.avanzamento_barra()
-    else:
-        container_centrale = st.empty()
-
-    print(str(api_key))
+    if lesson_type == "Lezione di ripasso con domande":
+        if st.sidebar.checkbox('Mostra Progressi'):
+            container_button.empty()
+            container_centrale = lz.avanzamento_barra(connection)
+        else:
+            container_centrale = st.empty()
 
 
 
