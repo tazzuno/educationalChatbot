@@ -31,7 +31,7 @@ def display_lesson(lesson_selection, lesson_info):
     """Visualizza una lezione specifica.
 
     Parameters:
-    lesson_selection (str): Il titolo o la selezione della lezione da visualizzare.
+    lesson_selection (str): Il titolo della lezione da visualizzare.
     lesson_info (dict): Un dizionario contenente le informazioni sulla lezione, con la chiave "description" per la descrizione.
 
     Returns:
@@ -45,6 +45,20 @@ def display_lesson(lesson_selection, lesson_info):
 
 
 def run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection, openai_api_key):
+    """Esegue il modello Langchain per gestire le lezioni e interagire con l'utente tramite il chatbot.
+
+    Parameters:
+    prompt (str): Il prompt iniziale per il modello.
+    lesson_type (str): Il tipo di lezione.
+    lesson_content (str): Il contenuto della lezione.
+    lesson_selection (str): La selezione della lezione.
+    openai_api_key (str): La chiave API di OpenAI per l'accesso al modello.
+
+    Returns:
+    None
+
+    """
+    
     try:
 
         # Set up a streaming handler for the model
@@ -76,6 +90,16 @@ def run_langchain_model(prompt, lesson_type, lesson_content, lesson_selection, o
 
 @st.cache_data()
 def get_lesson_content(lesson_file):
+    """Ottiene il contenuto di una lezione da un file.
+
+    Parameters:
+    lesson_file (str): Il percorso del file della lezione.
+
+    Returns:
+    str: Il contenuto della lezione.
+
+    """
+    
     try:
         with open(lesson_file, "r") as f:
             return f.read()
@@ -85,6 +109,14 @@ def get_lesson_content(lesson_file):
 
 
 def download_chat():
+    """Genera e scarica la conversazione nel formato HTML.
+
+    La funzione genera un file HTML che rappresenta la conversazione
+    registrata tra l'utente e l'assistente. Il file HTML include
+    messaggi dell'utente e dell'assistente formattati.
+
+    """
+    
     messages = st.session_state.get("messages", [])  # Retrieve messages from session state
 
     chat_content = "<html><head><link rel='stylesheet' type='text/css' href='styles.css'></head><body>"
