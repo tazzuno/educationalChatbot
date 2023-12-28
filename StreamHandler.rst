@@ -1,0 +1,5 @@
+StreamHandler
+=============
+
+.. automodule:: StreamHandler
+   :members:
