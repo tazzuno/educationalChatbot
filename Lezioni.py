@@ -1,40 +1,10 @@
-import tempfile
 import time
-import os
-from bs4 import BeautifulSoup
 import streamlit as st
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 import get_prompt
 from langchain.schema import AIMessage, HumanMessage
 from StreamHandler import StreamHandler
-
-
-def upload_chat():
-    uploaded_file = st.file_uploader("Upload Chat HTML", type="html")
-
-    if uploaded_file:
-        content = uploaded_file.read()
-        messages = parse_chat_html(content)
-        st.session_state.messages = messages
-        st.success("Chat loaded successfully!")
-
-
-def parse_chat_html(html_content):
-    soup = BeautifulSoup(html_content, "html.parser")
-    messages = []
-
-    for p_tag in soup.find_all("p", class_="message"):
-        strong_tag = p_tag.find("strong")
-        if strong_tag:
-            if strong_tag.text == "AI:":
-                messages.append(AIMessage(p_tag.text[len("AI:"):].strip()))
-            elif strong_tag.text == "User:":
-                messages.append(HumanMessage(p_tag.text[len("User:"):].strip()))
-            else:
-                st.warning(f"Unknown message type: {strong_tag.text}")
-
-    return messages
 
 
 def handle_messages():
@@ -114,6 +84,23 @@ def download_chat():
     # Download the generated HTML file
     st.download_button("Download Chat", open("chat.html", "rb"), key="download_chat", file_name="chat.html",
                        mime="text/html")
+
+
+def save_chat_history(connection, username, lesson_id, chat_history):
+    cursor = connection.cursor()
+    query = "INSERT INTO chat_history (username, content, sender, lesson_id) VALUES (%s, %s, %s, %s)"
+    values = [(username, message.content, message.sender, lesson_id) for message in chat_history]
+    cursor.executemany(query, values)
+    connection.commit()
+
+
+def load_chat_history(connection, username, lesson_id):
+    cursor = connection.cursor()
+    query = "SELECT content, sender FROM chat_history WHERE username = %s AND lesson_id = %s"
+    values = (username, lesson_id)
+    cursor.execute(query, values)
+    result = cursor.fetchall()
+    return [HumanMessage(content=row[0]) if row[1] == "user" else AIMessage(content=row[0]) for row in result]
 
 
 def reset_lesson():

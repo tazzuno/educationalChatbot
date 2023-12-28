@@ -1,0 +1,40 @@
+Chapter 1: Software Requirements
+
+Questa lezione approfondisce i fondamenti e il processo di ingegneria dei requisiti software, coprendo argomenti come definizione, classificazione, elicitation, analisi, specifica, validazione e considerazioni pratiche, offrendo una panoramica completa del ciclo di vita dei requisiti.
+
+Chapter 2: Software Design
+
+Questa lezione approfondisce i fondamenti del design del software, esaminando concetti generali, il contesto, i principi e le questioni chiave come la concorrenza, il controllo degli eventi e la sicurezza. Copre anche la struttura e l'architettura del software, la progettazione dell'interfaccia utente, l'analisi della qualità e valutazione, utilizzando notazioni specifiche e strategie di progettazione, inclusi approcci orientati alla funzione, orientati agli oggetti e basati su componenti, insieme a strumenti pratici utilizzati in questo contesto.
+
+Chapter 3: Software Construction
+
+Questa lezione si occupa dei fondamenti della costruzione del software, esaminando aspetti come la minimizzazione della complessità, l'anticipazione del cambiamento e il riutilizzo del codice. Affronta anche la gestione della costruzione, considerazioni pratiche come design, testing e integrazione, oltre a esplorare tecnologie di costruzione come design API, gestione degli errori e strumenti di analisi delle prestazioni.
+
+Chapter 4: Software Testing
+
+Questa lezione introduce i fondamenti del testing software, includendo terminologia, livelli di test, tecniche di test, misure correlate e strumenti di testing. Copre anche il processo di test con considerazioni pratiche e attività associate.
+
+Chapter 5: Software Maintenance
+
+Questa lezione introduce i fondamenti della manutenzione del software, coprendo definizioni, la natura e la necessità della manutenzione, insieme a costi e categorie. Affronta anche questioni chiave come aspetti tecnici e gestionali, stime dei costi e processi di misurazione. La lezione presenta inoltre tecniche di manutenzione come la comprensione del programma, la riconversione e strumenti correlati.
+
+Chapter 6: Software Configuration Management
+
+Questa lezione tratta la gestione del processo di Configuration Management Software (SCM), inclusi il contesto organizzativo, la pianificazione, la creazione del piano SCM e la sorveglianza del processo. Affronta l'identificazione delle configurazioni software, il controllo, la rendicontazione dello stato e l'auditing, insieme alla gestione delle release del software e agli strumenti di Configuration Management Software.
+
+Chapter 7: Software Engineering Management
+
+Questa lezione si concentra sull'iniziazione e definizione dello scope dei progetti software, pianificazione, implementazione, revisione e chiusura. Affronta anche la misurazione dell'ingegneria del software e presenta gli strumenti di gestione dell'ingegneria del software.
+
+Chapter 8: Software Engineering Process
+
+Questa lezione esplora la definizione dei processi software, cicli di vita del software, adattamento dei processi e considerazioni pratiche. Affronta anche la valutazione e il miglioramento dei processi, la misurazione del software e presenta strumenti di ingegneria del software.
+
+Chapter 9: Software Engineering Models
+
+Questa lezione introduce i principi della modellazione, tipologie di modelli (informazione, comportamentale, strutturale), e analisi dei modelli per completezza, coerenza e correttezza. Copre anche vari metodi di ingegneria del software, tra cui euristici, formali, prototipazione e agili.
+
+Chapter 10: Software Quality
+
+Questa lezione esplora i fondamenti della qualità del software, comprendendo cultura ed etica dell'ingegneria del software, valore e costi della qualità, modelli e miglioramento. Copre anche i processi di gestione della qualità, considerazioni pratiche come requisiti e caratterizzazione dei difetti, e presenta strumenti di gestione della qualità del software.
+
