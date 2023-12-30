@@ -135,48 +135,6 @@ def download_chat():
                        mime="text/html")
 
 
-def save_chat_history(connection, username, lesson_id, chat_history):
-    """Salva la cronologia della chat nel database.
-
-    Parameters:
-    connection: Connessione al database.
-    username (str): Nome utente.
-    lesson_id (int): ID della lezione.
-    chat_history (list): Lista dei messaggi da salvare.
-
-    Returns:
-    None
-
-    """
-
-    cursor = connection.cursor()
-    query = "INSERT INTO chat_history (username, content, sender, lesson_id) VALUES (%s, %s, %s, %s)"
-    values = [(username, message.content, message.sender, lesson_id) for message in chat_history]
-    cursor.executemany(query, values)
-    connection.commit()
-
-
-def load_chat_history(connection, username, lesson_id):
-    """Carica la cronologia della chat dal database.
-
-    Parameters:
-    connection: Connessione al database.
-    username (str): Nome utente.
-    lesson_id (int): ID della lezione.
-
-    Returns:
-    list: Lista dei messaggi della cronologia della chat.
-
-    """
-
-    cursor = connection.cursor()
-    query = "SELECT content, sender FROM chat_history WHERE username = %s AND lesson_id = %s"
-    values = (username, lesson_id)
-    cursor.execute(query, values)
-    result = cursor.fetchall()
-    return [HumanMessage(content=row[0]) if row[1] == "user" else AIMessage(content=row[0]) for row in result]
-
-
 def reset_lesson():
     """Ripristina lo stato della lezione.
 
